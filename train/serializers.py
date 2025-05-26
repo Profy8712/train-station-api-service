@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db import transaction
 from .models import (
     Station,
     Route,
@@ -107,7 +108,7 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ["id", "created_at", "tickets"]
 
     def create(self, validated_data):
-        with serializers.atomic():
+        with transaction.atomic():
             tickets_data = validated_data.pop("tickets")
             order = Order.objects.create(**validated_data)
             for ticket_data in tickets_data:
@@ -122,3 +123,4 @@ class OrderListSerializer(OrderSerializer):
     class Meta:
         model = Order
         fields = ["id", "created_at", "user", "tickets"]
+        

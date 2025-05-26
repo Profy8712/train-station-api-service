@@ -69,14 +69,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "train_station_api_service.wsgi.application"
 
-# Database
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("POSTGRES_DB", "train_db"),
         "USER": os.getenv("POSTGRES_USER", "train_user"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", "train_password"),
-        "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+        "HOST": os.getenv("POSTGRES_HOST", "db"), 
         "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
@@ -106,11 +105,12 @@ USE_TZ = True
 # Static files
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = '/app/staticfiles'
 
 # Media files
 MEDIA_URL = "media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
+MEDIA_ROOT = '/app/media'
 # Default primary key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

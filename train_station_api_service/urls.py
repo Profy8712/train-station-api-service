@@ -1,20 +1,3 @@
-"""
-URL configuration for train_station_api_service project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
 from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import (
@@ -22,23 +5,35 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
     SpectacularRedocView
 )
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view(["GET"])
+def api_root(request):
+    return Response({
+        "user": {
+            "register": request.build_absolute_uri("api/user/register/"),
+            "login": request.build_absolute_uri("api/user/token/"),
+            "profile": request.build_absolute_uri("api/user/me/")
+        },
+        "train": {
+            "stations": request.build_absolute_uri("api/train/stations/"),
+            "routes": request.build_absolute_uri("api/train/routes/"),
+            "trains": request.build_absolute_uri("api/train/trains/"),
+            "journeys": request.build_absolute_uri("api/train/journeys/")
+        },
+        "docs": {
+            "swagger": request.build_absolute_uri("api/docs/"),
+            "redoc": request.build_absolute_uri("api/redoc/")
+        }
+    })
 
 urlpatterns = [
+    path("", api_root, name="api-root"),
     path("admin/", admin.site.urls),
-    path("api/user/", include("user.urls")),
-    path("api/", include("train.urls")),
-
-    # Documentation
+    path("api/user/", include("user.urls", namespace="user")),
+    path("api/train/", include("train.urls", namespace="train")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path(
-        "api/docs/",
-        SpectacularSwaggerView.as_view(url_name="schema"),
-        name="swagger-ui"
-    ),
-    path(
-        "api/redoc/",
-        SpectacularRedocView.as_view(url_name="schema"),
-        name="redoc"
-    ),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]
-

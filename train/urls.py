@@ -10,18 +10,16 @@ from .views import (
     OrderViewSet
 )
 
-
 router = routers.DefaultRouter()
-router.register("stations", StationViewSet)
-router.register("routes", RouteViewSet)
-router.register("train-types", TrainTypeViewSet)
-router.register("trains", TrainViewSet)
-router.register("crews", CrewViewSet)
-router.register("journeys", JourneyViewSet)
-router.register("orders", OrderViewSet)
+router.register("stations", StationViewSet, basename="station")
+router.register("routes", RouteViewSet, basename="route")
+router.register("train-types", TrainTypeViewSet, basename="traintype")
+router.register("trains", TrainViewSet, basename="train")
+router.register("crews", CrewViewSet, basename="crew")
+router.register("journeys", JourneyViewSet, basename="journey")
+router.register("orders", OrderViewSet, basename="order")
 
 app_name = "train"
-
 
 urlpatterns = [
     path("", include(router.urls)),

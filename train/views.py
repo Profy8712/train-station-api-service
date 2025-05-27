@@ -1,4 +1,3 @@
-# train/views.py
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count, F
@@ -115,11 +114,12 @@ class OrderViewSet(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
+    queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return Order.objects.filter(
+        return super().get_queryset().filter(
             user=self.request.user
         ).prefetch_related(
             "tickets__journey__route",

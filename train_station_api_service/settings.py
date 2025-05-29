@@ -16,7 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security settings
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-key-for-dev")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost 127.0.0.1").split()
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost 127.0.0.1 web db").split()
 
 # Application definition
 INSTALLED_APPS = [
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -54,7 +55,7 @@ ROOT_URLCONF = "train_station_api_service.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -69,13 +70,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "train_station_api_service.wsgi.application"
 
+# Database
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("POSTGRES_DB", "train_db"),
         "USER": os.getenv("POSTGRES_USER", "train_user"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", "train_password"),
-        "HOST": os.getenv("POSTGRES_HOST", "db"), 
+        "HOST": os.getenv("POSTGRES_HOST", "db"),
         "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
@@ -87,6 +89,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 8,
+        }
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -98,20 +103,20 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "Europe/Kyiv"
+TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# Static files
-STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATIC_ROOT = '/app/staticfiles'
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = "/static/"
+STATIC_ROOT = "/app/staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Media files
-MEDIA_URL = "media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_ROOT = '/app/media'
-# Default primary key
+# Media files (user uploaded)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = "/app/media"
+
+# Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom user model
@@ -147,6 +152,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+CORS_ALLOW_CREDENTIALS = True
 
 # Documentation
 SPECTACULAR_SETTINGS = {
@@ -158,7 +164,9 @@ SPECTACULAR_SETTINGS = {
         "deepLinking": True,
         "defaultModelRendering": "model",
         "defaultModelsExpandDepth": 2,
+        "persistAuthorization": True,
     },
+    "COMPONENT_SPLIT_REQUEST": True,
 }
 
 # Production security
@@ -172,3 +180,6 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_REFERRER_POLICY = "same-origin"
+    

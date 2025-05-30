@@ -38,12 +38,14 @@ class TrainType(models.Model):
 
 class Train(models.Model):
     name = models.CharField(max_length=255)
-    cargo_num = models.IntegerField()
-    places_in_cargo = models.IntegerField()
+    cargo_num = models.IntegerField(default=0)
+    places_in_cargo = models.IntegerField(default=0)
     train_type = models.ForeignKey(TrainType, on_delete=models.CASCADE)
 
     @property
     def total_seats(self):
+        if self.cargo_num is None or self.places_in_cargo is None:
+            return 0
         return self.cargo_num * self.places_in_cargo
 
     def __str__(self):
